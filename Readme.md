@@ -1,58 +1,179 @@
 
 # 🧠 MetaLearner – Learning-to-Learn Optimization
 
-A meta-optimization research project that trains models to predict and improve training dynamics on MNIST.
+A meta-optimization research project focused on modeling and predicting neural network training dynamics — from MNIST classifiers to Transformer and MoE-based language models.
 
-## 🎯 Quick Start
+MetaLearner does not just train models.
+It learns **how models train**.
 
-**Goal:** Train multiple MNIST models with varied architectures, log per-step dynamics, then train a meta-learner to predict optimization behavior and reduce convergence epochs.
+---
 
-**Success metric:** Reduce training from ~10 epochs to 4–6 epochs while maintaining accuracy.
+## 🎯 Objective
+
+Train multiple neural networks with varying architectures, log detailed optimization statistics per step, and train a meta-model that can:
+
+* Predict next-step loss
+* Detect instability before divergence
+* Recommend learning rate adjustments
+* Reduce convergence epochs
+* Improve training efficiency on limited hardware
+
+**Target Success Metric:**
+Reduce training from ~10 epochs to ~4–6 epochs while maintaining equivalent accuracy.
 
 ---
 
 ## 🔬 How It Works
 
-1. **Phase 1: Base Model Training**
-    - Train 30–100 MNIST models with varying depth, width, activations, and optimizers
-    - Log gradient norms, weight updates, loss deltas, and accuracy per step
+### Phase 1 – Base Model Training
 
-2. **Phase 2: Dataset Construction**
-    - Convert logs into structured rows: `[loss, grad_norm, weight_norm, update_ratio, lr, depth, width, activation, next_loss]`
-    - Target: predict next loss, convergence speed, or ideal LR adjustment
+Train 30–100 models with varying:
 
-3. **Phase 3: MetaLearner Model**
-    - Train an MLP, Transformer, or PB-ANN model on optimization sequences
-    - Learn patterns: gradient explosions, plateaus, optimal LR scaling, early stopping signals
+* Depth (2–6+ layers)
+* Width (64–1024+ neurons)
+* Activation functions (ReLU, GELU, Tanh)
+* Optimizers (SGD, Adam, AdamW)
+* Learning rates
+
+Initial dataset: MNIST
+Future targets: CIFAR-10, small Transformers, MoE models
+
+Each training step logs structured optimization statistics.
+
+---
+
+### Phase 2 – Optimization Dataset Construction
+
+Training logs are converted into structured state vectors:
+
+```
+[loss, delta_loss, grad_norm, update_ratio, layer_grad_mean,
+ layer_grad_std, lr, architecture_encoding, next_loss]
+```
+
+Optional advanced metrics (for Transformers / MoE):
+
+* Attention entropy (mean/std)
+* Expert load balance entropy
+* Activation sparsity %
+* FP16 overflow flags
+
+This produces a dataset of **optimization states over time**.
+
+---
+
+### Phase 3 – MetaLearner Model
+
+Train a model on optimization sequences:
+
+Possible architectures:
+
+* MLP baseline
+* Transformer over time-series optimization states
+* PB-ANN sparse meta-controller
+* Reinforcement-style adaptive optimizer
+
+The model learns patterns such as:
+
+* Gradient explosion precursors
+* Plateau detection
+* Optimal LR scaling regions
+* Early stopping signals
+* Architecture-dependent convergence behavior
 
 ---
 
 ## 📊 Critical Logging Requirements
 
-Per training step, capture:
-- **Loss:** current loss, ΔLoss
-- **Accuracy:** train & validation
-- **Gradients:** norm ‖g‖₂, per-layer norms
-- **Weights:** norm ‖W‖₂, update norm ‖ΔW‖₂, update-to-weight ratio
-- **Metadata:** LR, optimizer, batch/epoch index, architecture encoding
+Per training step:
+
+### Core Metrics
+
+* Loss and ΔLoss
+* Learning rate
+* Global gradient norm ‖g‖₂
+* Update-to-weight ratio ‖ΔW‖ / ‖W‖
+
+### Layer-Level Statistics
+
+* Per-layer gradient norm mean/std
+
+### Optional (Transformer / MoE)
+
+* Attention entropy mean/std
+* Expert load balance entropy
+* Activation sparsity %
+* Mixed precision overflow events
+
+All logging runs asynchronously to avoid slowing GPU training.
 
 ---
 
-## 💡 Why It Matters
+## 💡 Why This Matters
 
-You're building a **dataset of optimization physics**. MetaLearner learns when gradients explode, when convergence accelerates, and how architecture affects optimization speed—enabling intelligent training acceleration.
+Training large models is:
+
+* Computationally expensive
+* Hyperparameter-sensitive
+* Often unstable
+* Difficult to optimize manually
+
+MetaLearner aims to model the **physics of optimization itself**, enabling:
+
+* Smarter training schedules
+* Reduced compute usage
+* Stability prediction
+* Hardware-aware optimization
+* Adaptive sparse expert routing
+
+This becomes especially powerful in constrained environments (e.g., 4GB VRAM GPUs).
 
 ---
 
-## 🖥 Your Hardware
+## 🖥 Hardware Target
 
-- i7 11th Gen, RTX 3050 Ti (4GB), 16GB RAM
-- Sufficient for 50–100 MNIST experiments with efficient logging
+Designed to operate on:
+
+* i7 11th Gen
+* RTX 3050 Ti (4GB VRAM)
+* 16GB RAM
+
+The system emphasizes efficient logging and low-overhead experimentation.
 
 ---
 
-## 🚀 Future Extensions
+## 🚀 Long-Term Vision
 
-- CIFAR-10, tiny language models
-- Integration with MoE routing, PB-ANN inhibition control, BrahmaLLM optimization
-- Publishable research in learning-to-learn systems
+MetaLearner will integrate with:
+
+* Transformer training pipelines
+* Sparse Mixture-of-Experts (MoE) systems
+* Inhibition-based routing architectures
+* Low-VRAM LLM training
+* Adaptive quantized expert systems
+
+Ultimate goal:
+
+A closed-loop intelligent training controller capable of dynamically steering large-scale model optimization.
+
+---
+
+## 🧪 Current Status
+
+* ✅ Parallel asynchronous logging system implemented
+* 🔄 Multi-model MNIST experiment phase
+* 🔜 Meta-model training
+* 🔮 Future integration with LLM and MoE optimization
+
+---
+
+## 📈 Research Themes
+
+* Learning-to-Learn
+* Optimization dynamics modeling
+* Gradient flow analysis
+* Sparse expert load balancing
+* Stability prediction in mixed precision
+* Hardware-aware AI training
+
+---
